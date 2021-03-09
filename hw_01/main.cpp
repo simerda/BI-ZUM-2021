@@ -1,5 +1,6 @@
 #include <iostream>
 #include "Maze.h"
+#include "RandomSearch.h"
 
 using namespace std;
 
@@ -13,8 +14,11 @@ int main()
         return 1;
     }
 
-        Maze maze = Maze::parseFromFile(path);
-        maze.print();
+    RandomSearch test;
+
+    Maze maze(path);
+    RandomSearch searchAlgorithm;
+    maze.solve(searchAlgorithm);
 
     return 0;
 }

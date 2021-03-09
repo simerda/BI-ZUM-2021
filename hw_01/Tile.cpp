@@ -45,7 +45,7 @@ string Tile::toString() const
     }
 
     if(state == TileEnum::CLOSED){
-        return "C";
+        return "o";
     }
 
     if(state == TileEnum::START){
@@ -64,7 +64,12 @@ void Tile::setState(const TileEnum &state)
     Tile::state = state;
 }
 
-void Tile::addNeighbour(reference_wrapper<Tile> tile)
+void Tile::addNeighbour(Tile &tile)
 {
-    neighbours.push_back(tile);
+    neighbours.emplace_back(tile);
+}
+
+vector<reference_wrapper<Tile>> &Tile::getNeighbours()
+{
+    return neighbours;
 }

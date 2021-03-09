@@ -27,14 +27,16 @@ class Tile {
 public:
     Tile(TileEnum state);
 
-    static Tile fromChar(const char character);
+    static Tile fromChar(char character);
 
     TileEnum getState() const;
     void setState(const TileEnum &state);
 
     string toString() const;
 
-    void addNeighbour(reference_wrapper<Tile> tile);
+    void addNeighbour(Tile &tile);
+
+    vector<reference_wrapper<Tile>>& getNeighbours();
 
 private:
     TileEnum state;

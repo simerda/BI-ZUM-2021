@@ -29,18 +29,10 @@ using std::vector;
 using std::istringstream;
 using std::endl;
 using std::cout;
+using std::cin;
 using std::ref;
 
-Maze::Maze(const vector<vector<Tile>> &field, int startX, int startY, int endX, int endY)
-{
-    Maze::field = field;
-    Maze::startX = startX;
-    Maze::startY = startY;
-    Maze::endX = endX;
-    Maze::endY = endY;
-}
-
-Maze Maze::parseFromFile(const string &path)
+Maze::Maze(const string &path)
 {
     ifstream input;
     input.open(path);
@@ -53,7 +45,6 @@ Maze Maze::parseFromFile(const string &path)
     unsigned int width = 0;
 
     bool firstLine = true;
-    vector<vector<Tile>> tiles;
     while (getline(input, line)) {
 
         if (firstLine) {
@@ -94,7 +85,7 @@ Maze Maze::parseFromFile(const string &path)
         for (unsigned int i = 0; i < width; i++) {
             row.push_back(Tile::fromChar(line.at(i)));
         }
-        tiles.push_back(row);
+        field.push_back(row);
 
         if (lastLine) {
             break;
@@ -108,7 +99,6 @@ Maze Maze::parseFromFile(const string &path)
         throw runtime_error("Wrong format");
     }
 
-    int startX, startY, endX, endY;
     char c;
     line = line.substr(6);
     istringstream stringStream;
@@ -123,35 +113,34 @@ Maze Maze::parseFromFile(const string &path)
     stringStream.str(line);
     stringStream >> endX >> c >> endY;
 
-    if (tiles[startY][startX].getState() == TileEnum::WALL || tiles[endY][endX].getState() == TileEnum::WALL
-    || (startX == endX && startY == endY)) {
+    if (field[startY][startX].getState() == TileEnum::WALL || field[endY][endX].getState() == TileEnum::WALL
+        || (startX == endX && startY == endY)) {
         throw runtime_error("Wrong format");
     }
 
-    tiles[startY][startX].setState(TileEnum::START);
-    tiles[endY][endX].setState(TileEnum::END);
+    field[startY][startX].setState(TileEnum::START);
+    field[endY][endX].setState(TileEnum::END);
 
     // add tile neighbours
-    for (unsigned int y = 0; y < tiles.size(); y++) {
+    for (unsigned int y = 0; y < field.size(); y++) {
 
         for (unsigned int x = 0; x < width; x++) {
 
-            for (int vX = -1; vX <= 1; vX += 2) {
-                for (int vY = -1; vY <= 1; vY += 2) {
+            for (int vX = -1; vX <= 1; vX++) {
+                for (int vY = -1; vY <= 1; vY++) {
                     int proposedX = (int) x + vX;
                     int proposedY = (int) y + vY;
                     // check if valid move
-                    if (proposedX > 0 && (unsigned int) proposedX < width && proposedY > 0
-                        && (unsigned int) proposedY < tiles.size()
-                        && tiles[proposedY][proposedX].getState() == TileEnum::FRESH) {
-                        tiles[y][x].addNeighbour(ref(tiles[proposedY][proposedX]));
+                    if (abs(vX) != abs(vY) && proposedX > 0 && (unsigned int) proposedX < width && proposedY > 0
+                        && (unsigned int) proposedY < field.size()
+                        && (field[proposedY][proposedX].getState() == TileEnum::FRESH
+                        || field[proposedY][proposedX].getState() == TileEnum::END)) {
+                        field[y][x].addNeighbour(field[proposedY][proposedX]);
                     }
                 }
             }
         }
     }
-
-    return Maze(tiles, startX, startY, endX, endY);
 }
 
 void Maze::print()
@@ -166,4 +155,26 @@ void Maze::print()
         cout << endl;
     }
 
+}
+
+void Maze::solve(SearchAlgorithmInterface &searchAlgorithm)
+{
+    reference_wrapper<Tile> current = field[startY][startX];
+
+    string s;
+    while(current.get().getState() != TileEnum::END){
+        print();
+        cout << "Press enter to continue..." << endl;
+        getline(cin, s);
+
+        searchAlgorithm.expand(current);
+        try{
+            current = searchAlgorithm.next();
+        } catch (const runtime_error &e) {
+            cout << "Path from start to finish doesn't exist." << endl;
+            return;
+        }
+    }
+
+    print();
 }
