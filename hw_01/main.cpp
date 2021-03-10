@@ -1,6 +1,7 @@
 #include <iostream>
 #include "Maze.h"
 #include "RandomSearch.h"
+#include "DepthFirstSearch.h"
 
 using namespace std;
 
@@ -16,7 +17,7 @@ int main()
     RandomSearch test;
 
     Maze maze(path);
-    RandomSearch searchAlgorithm;
+    DepthFirstSearch searchAlgorithm;
     maze.solve(searchAlgorithm);
 
     return 0;
