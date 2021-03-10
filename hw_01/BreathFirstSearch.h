@@ -16,7 +16,7 @@ class BreathFirstSearch: public SearchAlgorithmInterface {
 public:
     void expand(Tile &tile) override;
 
-    Tile& next() override;
+    Tile& next(const Tile &targetTile) override;
 
 private:
     deque<reference_wrapper<Tile>> available;

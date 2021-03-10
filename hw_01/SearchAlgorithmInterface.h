@@ -15,7 +15,7 @@ public:
 
     virtual void expand(Tile &tile) = 0;
 
-    virtual Tile& next() = 0;
+    virtual Tile& next(const Tile &targetTile) = 0;
 };
 
 

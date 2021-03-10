@@ -13,7 +13,7 @@ class RandomSearch: public SearchAlgorithmInterface {
 public:
     void expand(Tile &tile) override;
 
-    Tile& next() override;
+    Tile& next(const Tile &targetTile) override;
 
 private:
     vector<reference_wrapper<Tile>> available;

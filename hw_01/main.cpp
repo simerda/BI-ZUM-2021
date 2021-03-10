@@ -2,6 +2,8 @@
 #include "Maze.h"
 #include "RandomSearch.h"
 #include "DepthFirstSearch.h"
+#include "BreathFirstSearch.h"
+#include "GreedySearch.h"
 
 using namespace std;
 
@@ -14,10 +16,9 @@ int main()
         cout << "Wrong input!" << endl;
         return 1;
     }
-    RandomSearch test;
 
     Maze maze(path);
-    DepthFirstSearch searchAlgorithm;
+    GreedySearch searchAlgorithm;
     maze.solve(searchAlgorithm);
 
     return 0;

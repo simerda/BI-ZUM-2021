@@ -8,18 +8,18 @@
 
 using std::runtime_error;
 
-Tile::Tile(TileEnum state): state(state)
+Tile::Tile(unsigned int xPos, unsigned int yPos, TileEnum state): xPos(xPos), yPos(yPos), state(state)
 {
 }
 
-Tile Tile::fromChar(const char character)
+Tile Tile::fromChar(unsigned int xPos, unsigned int yPos, const char character)
 {
     if(character == ' '){
-        return Tile(TileEnum::FRESH);
+        return Tile(xPos, yPos, TileEnum::FRESH);
     }
 
     if(character == 'X'){
-        return Tile(TileEnum::WALL);
+        return Tile(xPos, yPos, TileEnum::WALL);
     }
 
     throw runtime_error("Unrecognized character");
@@ -86,4 +86,14 @@ void Tile::setExpandedBy(Tile &tile)
 Tile *Tile::getExpandedBy() const
 {
     return expandedBy;
+}
+
+unsigned int Tile::getXPos() const
+{
+    return xPos;
+}
+
+unsigned int Tile::getYPos() const
+{
+    return yPos;
 }

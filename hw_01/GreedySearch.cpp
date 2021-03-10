@@ -1,16 +1,14 @@
 //
-// Created by simerjan on 09.03.21.
+// Created by simerjan on 10.03.21.
 //
 
-#include "RandomSearch.h"
-#include <functional>
-#include <iterator>
+#include "GreedySearch.h"
+#include <stdexcept>
 
 using std::ref;
-using std::advance;
 using std::runtime_error;
 
-void RandomSearch::expand(Tile &tile)
+void GreedySearch::expand(Tile &tile)
 {
     if(tile.getState() != TileEnum::START){
         tile.setState(TileEnum::CLOSED);
@@ -35,17 +33,31 @@ void RandomSearch::expand(Tile &tile)
     }
 }
 
-Tile &RandomSearch::next(const Tile &targetTile)
+Tile &GreedySearch::next(const Tile &targetTile)
 {
     if(available.empty()){
         throw runtime_error("no more available tiles");
     }
-    unsigned int selected = rand() % available.size();
-    reference_wrapper<Tile> selectedTile = available[selected];
+    uint32_t bestMetric = INT32_MAX;
+    unsigned int index = 0;
 
+    for(unsigned int i = 0; i < available.size(); i++){
+        if(metric(available[i].get(), targetTile) < bestMetric){
+            bestMetric = metric(available[i].get(), targetTile);
+            index = i;
+        }
+    }
+
+    Tile &selected = available[index].get();
     auto iterator = available.begin();
-    advance(iterator, selected);
+    advance(iterator, index);
     available.erase(iterator);
 
-    return selectedTile.get();
+    return selected;
+}
+
+unsigned int GreedySearch::metric(const Tile &tile, const Tile &targetTile)
+{
+    return abs((int)tile.getXPos() - (int)targetTile.getXPos())
+    + abs((int) tile.getYPos() - (int)targetTile.getYPos());
 }

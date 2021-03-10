@@ -44,10 +44,10 @@ Maze::Maze(const string &path)
 
     unsigned int width = 0;
 
-    bool firstLine = true;
+    int lineNumber = 0;
     while (getline(input, line)) {
 
-        if (firstLine) {
+        if (lineNumber == 0) {
             for (const char &character : line) {
                 width++;
                 if (character != 'X') {
@@ -70,8 +70,7 @@ Maze::Maze(const string &path)
             throw runtime_error("Wrong format");
         }
 
-        bool lastLine = !firstLine;
-        firstLine = false;
+        bool lastLine = lineNumber != 0;
         for (const char &character : line) {
             if (character != 'X') {
                 lastLine = false;
@@ -83,7 +82,7 @@ Maze::Maze(const string &path)
         row.reserve(width);
 
         for (unsigned int i = 0; i < width; i++) {
-            row.push_back(Tile::fromChar(line.at(i)));
+            row.push_back(Tile::fromChar(i, lineNumber++, line.at(i)));
         }
         field.push_back(row);
 
@@ -160,12 +159,12 @@ void Maze::print(bool final)
         cout << "\n\n" << endl;
     }
     cout << "Legend:" << endl;
-    cout << Tile(TileEnum::START).toString() + ": Start" << endl;
-    cout << Tile(TileEnum::END).toString() + ": End" << endl;
-    cout << Tile(TileEnum::OPEN).toString() + ": Opened node" << endl;
-    cout << Tile(TileEnum::CLOSED).toString() + ": Closed node" << endl;
-    cout << Tile(TileEnum::PATH).toString() + ": Path" << endl;
-    cout << Tile(TileEnum::WALL).toString() + ": Wall" << endl;
+    cout << Tile(0, 0, TileEnum::START).toString() + ": Start" << endl;
+    cout << Tile(0, 0, TileEnum::END).toString() + ": End" << endl;
+    cout << Tile(0, 0, TileEnum::OPEN).toString() + ": Opened node" << endl;
+    cout << Tile(0, 0, TileEnum::CLOSED).toString() + ": Closed node" << endl;
+    cout << Tile(0, 0, TileEnum::PATH).toString() + ": Path" << endl;
+    cout << Tile(0, 0, TileEnum::WALL).toString() + ": Wall" << endl;
     cout << "space: Fresh node" << endl;
     cout << endl;
 }
@@ -182,7 +181,7 @@ void Maze::solve(SearchAlgorithmInterface &searchAlgorithm)
 
         searchAlgorithm.expand(current);
         try{
-            current = searchAlgorithm.next();
+            current = searchAlgorithm.next(field[endY][endX]);
         } catch (const runtime_error &e) {
             cout << "Path from start to finish doesn't exist." << endl;
             return;

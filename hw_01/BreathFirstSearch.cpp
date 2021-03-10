@@ -31,7 +31,7 @@ void BreathFirstSearch::expand(Tile &tile)
     }
 }
 
-Tile &BreathFirstSearch::next()
+Tile &BreathFirstSearch::next(const Tile &targetTile)
 {
     if(available.empty()){
         throw runtime_error("no more available tiles");

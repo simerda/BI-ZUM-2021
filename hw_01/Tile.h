@@ -26,9 +26,9 @@ enum TileEnum{
 class Tile {
 
 public:
-    Tile(TileEnum state);
+    Tile(unsigned int xPos, unsigned int yPos, TileEnum state);
 
-    static Tile fromChar(char character);
+    static Tile fromChar(unsigned int xPos, unsigned int yPos, char character);
 
     TileEnum getState() const;
     void setState(const TileEnum &state);
@@ -43,10 +43,16 @@ public:
 
     Tile * getExpandedBy() const;
 
+    unsigned int getXPos() const;
+
+    unsigned int getYPos() const;
+
 private:
     Tile * expandedBy = nullptr;
-    TileEnum state;
     vector<reference_wrapper<Tile>> neighbours;
+    unsigned int xPos;
+    unsigned int yPos;
+    TileEnum state;
 };
 
 

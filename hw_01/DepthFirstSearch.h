@@ -15,7 +15,7 @@ class DepthFirstSearch: public SearchAlgorithmInterface{
 public:
     void expand(Tile &tile) override;
 
-    Tile& next() override;
+    Tile& next(const Tile &targetTile) override;
 
 private:
     stack<reference_wrapper<Tile>> available;

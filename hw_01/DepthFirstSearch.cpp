@@ -30,7 +30,7 @@ void DepthFirstSearch::expand(Tile &tile)
     }
 }
 
-Tile &DepthFirstSearch::next()
+Tile &DepthFirstSearch::next(const Tile &targetTile)
 {
     if(available.empty()){
         throw runtime_error("no more available tiles");
