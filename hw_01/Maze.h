@@ -16,7 +16,7 @@ class Maze {
 public:
     Maze(const string &path);
 
-    void print();
+    void print(bool final = false);
 
     void solve(SearchAlgorithmInterface &searchAlgorithm);
 

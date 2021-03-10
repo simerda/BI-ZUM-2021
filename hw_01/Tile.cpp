@@ -41,11 +41,11 @@ string Tile::toString() const
     }
 
     if(state == TileEnum::OPEN){
-        return "#";
+        return "\x1B[32m#\033[0m";
     }
 
     if(state == TileEnum::CLOSED){
-        return "◈";
+        return "\x1B[33m◈\033[0m";
     }
 
     if(state == TileEnum::START){
@@ -57,7 +57,7 @@ string Tile::toString() const
     }
 
     if(state == TileEnum::PATH){
-        return "o";
+        return "\x1B[31mo\033[0m";
     }
 
     throw runtime_error("Implementation error");

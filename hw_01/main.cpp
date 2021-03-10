@@ -13,7 +13,6 @@ int main()
         cout << "Wrong input!" << endl;
         return 1;
     }
-
     RandomSearch test;
 
     Maze maze(path);

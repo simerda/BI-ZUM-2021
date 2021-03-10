@@ -143,7 +143,7 @@ Maze::Maze(const string &path)
     }
 }
 
-void Maze::print()
+void Maze::print(bool final)
 {
     // clears console
     system(CLEAR_CALL);
@@ -154,13 +154,18 @@ void Maze::print()
         }
         cout << endl;
     }
-    cout << endl << endl << "Legend:" << endl;
-    cout << "S: Start" << endl;
-    cout << "E: End" << endl;
-    cout << "#: Opened node" << endl;
-    cout << "◈: Closed node" << endl;
-    cout << "o: Path" << endl;
-    cout << "X: Wall" << endl;
+    if(final){
+        cout << "Path found!\n" << endl;
+    }else{
+        cout << "\n\n" << endl;
+    }
+    cout << "Legend:" << endl;
+    cout << Tile(TileEnum::START).toString() + ": Start" << endl;
+    cout << Tile(TileEnum::END).toString() + ": End" << endl;
+    cout << Tile(TileEnum::OPEN).toString() + ": Opened node" << endl;
+    cout << Tile(TileEnum::CLOSED).toString() + ": Closed node" << endl;
+    cout << Tile(TileEnum::PATH).toString() + ": Path" << endl;
+    cout << Tile(TileEnum::WALL).toString() + ": Wall" << endl;
     cout << "space: Fresh node" << endl;
     cout << endl;
 }
@@ -188,7 +193,7 @@ void Maze::solve(SearchAlgorithmInterface &searchAlgorithm)
     buildPath(current);
     cout << "Press enter to continue..." << endl;
     getline(cin, s);
-    print();
+    print(true);
 }
 
 void Maze::buildPath(Tile &endTile) const
