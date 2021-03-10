@@ -154,7 +154,15 @@ void Maze::print()
         }
         cout << endl;
     }
-
+    cout << endl << endl << "Legend:" << endl;
+    cout << "S: Start" << endl;
+    cout << "E: End" << endl;
+    cout << "#: Opened node" << endl;
+    cout << "◈: Closed node" << endl;
+    cout << "o: Path" << endl;
+    cout << "X: Wall" << endl;
+    cout << "space: Fresh node" << endl;
+    cout << endl;
 }
 
 void Maze::solve(SearchAlgorithmInterface &searchAlgorithm)
@@ -177,4 +185,18 @@ void Maze::solve(SearchAlgorithmInterface &searchAlgorithm)
     }
 
     print();
+    buildPath(current);
+    cout << "Press enter to continue..." << endl;
+    getline(cin, s);
+    print();
+}
+
+void Maze::buildPath(Tile &endTile) const
+{
+    Tile * tilePtr = endTile.getExpandedBy();
+
+    while (tilePtr->getState() != TileEnum::START){
+        tilePtr->setState(TileEnum::PATH);
+        tilePtr = tilePtr->getExpandedBy();
+    }
 }

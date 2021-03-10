@@ -45,7 +45,7 @@ string Tile::toString() const
     }
 
     if(state == TileEnum::CLOSED){
-        return "o";
+        return "◈";
     }
 
     if(state == TileEnum::START){
@@ -54,6 +54,10 @@ string Tile::toString() const
 
     if(state == TileEnum::END){
         return "E";
+    }
+
+    if(state == TileEnum::PATH){
+        return "o";
     }
 
     throw runtime_error("Implementation error");
@@ -72,4 +76,14 @@ void Tile::addNeighbour(Tile &tile)
 vector<reference_wrapper<Tile>> &Tile::getNeighbours()
 {
     return neighbours;
+}
+
+void Tile::setExpandedBy(Tile &tile)
+{
+    expandedBy = &tile;
+}
+
+Tile *Tile::getExpandedBy() const
+{
+    return expandedBy;
 }

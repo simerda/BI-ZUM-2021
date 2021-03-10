@@ -18,6 +18,7 @@ enum TileEnum{
     FRESH,
     OPEN,
     CLOSED,
+    PATH,
     START,
     END
 };
@@ -38,7 +39,12 @@ public:
 
     vector<reference_wrapper<Tile>>& getNeighbours();
 
+    void setExpandedBy(Tile &tile);
+
+    Tile * getExpandedBy() const;
+
 private:
+    Tile * expandedBy = nullptr;
     TileEnum state;
     vector<reference_wrapper<Tile>> neighbours;
 };

@@ -20,6 +20,8 @@ public:
 
     void solve(SearchAlgorithmInterface &searchAlgorithm);
 
+    void buildPath(Tile &endTile) const;
+
 private:
     vector<vector<Tile>> field;
     int startX, startY, endX, endY;

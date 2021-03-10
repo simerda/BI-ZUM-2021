@@ -20,6 +20,7 @@ void RandomSearch::expand(Tile &tile)
     {
         // END discovered - will be stepped on in the next move
         if(neighbour.getState() == TileEnum::END){
+            neighbour.setExpandedBy(tile);
             available = vector<reference_wrapper<Tile>>();
             available.push_back(ref(neighbour));
             return;
@@ -27,6 +28,7 @@ void RandomSearch::expand(Tile &tile)
 
         // add fresh neighbours
         if(neighbour.getState() == TileEnum::FRESH){
+            neighbour.setExpandedBy(tile);
             neighbour.setState(TileEnum::OPEN);
             available.push_back(ref(neighbour));
         }
