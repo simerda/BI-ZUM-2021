@@ -14,7 +14,7 @@ public:
 
     Tile& next(const Tile &targetTile) override;
 
-    unsigned int metric(const Tile &tile, const Tile &targetTile);
+    double metric(const Tile &tile, const Tile &targetTile);
 
 private:
     vector<reference_wrapper<Tile>> available;

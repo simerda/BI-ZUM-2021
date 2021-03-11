@@ -82,9 +82,10 @@ Maze::Maze(const string &path)
         row.reserve(width);
 
         for (unsigned int i = 0; i < width; i++) {
-            row.push_back(Tile::fromChar(i, lineNumber++, line.at(i)));
+            row.push_back(Tile::fromChar(i, lineNumber, line.at(i)));
         }
         field.push_back(row);
+        lineNumber++;
 
         if (lastLine) {
             break;

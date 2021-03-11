@@ -11,7 +11,7 @@ using namespace std;
 
 int main()
 {
-
+    try{
     string path;
     cout << "Enter path to the input file:" << endl;
     if(! getline(cin, path)){
@@ -45,7 +45,10 @@ int main()
             break;
     }
     maze.solve(*searchAlgorithm);
-
     delete searchAlgorithm;
+    } catch (const runtime_error &e) {
+        cout << string("Error: ") + e.what() << endl;
+        return 1;
+    }
     return 0;
 }

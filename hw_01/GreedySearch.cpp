@@ -10,14 +10,13 @@ using std::runtime_error;
 
 void GreedySearch::expand(Tile &tile)
 {
-    if(tile.getState() != TileEnum::START){
+    if (tile.getState() != TileEnum::START) {
         tile.setState(TileEnum::CLOSED);
     }
 
-    for(Tile &neighbour : tile.getNeighbours())
-    {
+    for (Tile &neighbour : tile.getNeighbours()) {
         // END discovered - will be stepped on in the next move
-        if(neighbour.getState() == TileEnum::END){
+        if (neighbour.getState() == TileEnum::END) {
             neighbour.setExpandedBy(tile);
             available = vector<reference_wrapper<Tile>>();
             available.push_back(ref(neighbour));
@@ -25,7 +24,7 @@ void GreedySearch::expand(Tile &tile)
         }
 
         // add fresh neighbours
-        if(neighbour.getState() == TileEnum::FRESH){
+        if (neighbour.getState() == TileEnum::FRESH) {
             neighbour.setExpandedBy(tile);
             neighbour.setState(TileEnum::OPEN);
             available.push_back(ref(neighbour));
@@ -35,14 +34,14 @@ void GreedySearch::expand(Tile &tile)
 
 Tile &GreedySearch::next(const Tile &targetTile)
 {
-    if(available.empty()){
+    if (available.empty()) {
         throw runtime_error("no more available tiles");
     }
     uint32_t bestMetric = INT32_MAX;
     unsigned int index = 0;
 
-    for(unsigned int i = 0; i < available.size(); i++){
-        if(metric(available[i].get(), targetTile) < bestMetric){
+    for (unsigned int i = 0; i < available.size(); i++) {
+        if (metric(available[i].get(), targetTile) < bestMetric) {
             bestMetric = metric(available[i].get(), targetTile);
             index = i;
         }
