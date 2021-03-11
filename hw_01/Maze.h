@@ -16,11 +16,11 @@ class Maze {
 public:
     Maze(const string &path);
 
-    void print(bool final = false);
+    void print(bool final = false, int expandedNodes = -1, int pathLength = -1);
 
     void solve(SearchAlgorithmInterface &searchAlgorithm);
 
-    void buildPath(Tile &endTile) const;
+    int buildPath(Tile &endTile) const;
 
 private:
     vector<vector<Tile>> field;

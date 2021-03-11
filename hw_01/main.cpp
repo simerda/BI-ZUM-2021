@@ -4,6 +4,7 @@
 #include "DepthFirstSearch.h"
 #include "BreathFirstSearch.h"
 #include "GreedySearch.h"
+#include "AStarSearch.h"
 
 using namespace std;
 
@@ -18,7 +19,7 @@ int main()
     }
 
     Maze maze(path);
-    GreedySearch searchAlgorithm;
+    AStarSearch searchAlgorithm;
     maze.solve(searchAlgorithm);
 
     return 0;

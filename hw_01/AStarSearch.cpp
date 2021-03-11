@@ -1,21 +1,25 @@
 //
-// Created by simerjan on 10.03.21.
+// Created by simerjan on 11.03.21.
 //
 
-#include "GreedySearch.h"
+#include "AStarSearch.h"
 #include <stdexcept>
 
 using std::ref;
 using std::runtime_error;
 
-void GreedySearch::expand(Tile &tile)
+
+void AStarSearch::expand(Tile &tile)
 {
     if(tile.getState() != TileEnum::START){
         tile.setState(TileEnum::CLOSED);
     }
 
+    unsigned int nextDistance = tile.getDistanceFromStart() + 1;
     for(Tile &neighbour : tile.getNeighbours())
     {
+        neighbour.setDistanceFromStart(nextDistance);
+
         // END discovered - will be stepped on in the next move
         if(neighbour.getState() == TileEnum::END){
             neighbour.setExpandedBy(tile);
@@ -33,7 +37,7 @@ void GreedySearch::expand(Tile &tile)
     }
 }
 
-Tile &GreedySearch::next(const Tile &targetTile)
+Tile &AStarSearch::next(const Tile &targetTile)
 {
     if(available.empty()){
         throw runtime_error("no more available tiles");
@@ -42,8 +46,10 @@ Tile &GreedySearch::next(const Tile &targetTile)
     unsigned int index = 0;
 
     for(unsigned int i = 0; i < available.size(); i++){
-        if(metric(available[i].get(), targetTile) < bestMetric){
-            bestMetric = metric(available[i].get(), targetTile);
+        uint32_t currMetric = metric(available[i].get(), targetTile) + available[i].get().getDistanceFromStart();
+
+        if(currMetric < bestMetric){
+            bestMetric = currMetric;
             index = i;
         }
     }
@@ -64,8 +70,8 @@ Tile &GreedySearch::next(const Tile &targetTile)
  * @param targetTile
  * @return
  */
-unsigned int GreedySearch::metric(const Tile &tile, const Tile &targetTile)
+unsigned int AStarSearch::metric(const Tile &tile, const Tile &targetTile)
 {
     return abs((int)tile.getXPos() - (int)targetTile.getXPos())
-    + abs((int) tile.getYPos() - (int)targetTile.getYPos());
+           + abs((int) tile.getYPos() - (int)targetTile.getYPos());
 }

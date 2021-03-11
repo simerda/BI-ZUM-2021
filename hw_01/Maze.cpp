@@ -142,7 +142,7 @@ Maze::Maze(const string &path)
     }
 }
 
-void Maze::print(bool final)
+void Maze::print(bool final, int expandedNodes, int pathLength)
 {
     // clears console
     system(CLEAR_CALL);
@@ -166,6 +166,12 @@ void Maze::print(bool final)
     cout << Tile(0, 0, TileEnum::PATH).toString() + ": Path" << endl;
     cout << Tile(0, 0, TileEnum::WALL).toString() + ": Wall" << endl;
     cout << "space: Fresh node" << endl;
+    if(expandedNodes >= 0){
+        cout << "Nodes expanded: " << expandedNodes << endl;
+    }
+    if(pathLength >= 0){
+        cout << "Path length: " << pathLength << endl;
+    }
     cout << endl;
 }
 
@@ -173,13 +179,15 @@ void Maze::solve(SearchAlgorithmInterface &searchAlgorithm)
 {
     reference_wrapper<Tile> current = field[startY][startX];
 
+    int expanded = 0;
     string s;
     while(current.get().getState() != TileEnum::END){
-        print();
+        print(false, expanded);
         cout << "Press enter to continue..." << endl;
         getline(cin, s);
 
         searchAlgorithm.expand(current);
+        expanded++;
         try{
             current = searchAlgorithm.next(field[endY][endX]);
         } catch (const runtime_error &e) {
@@ -188,19 +196,23 @@ void Maze::solve(SearchAlgorithmInterface &searchAlgorithm)
         }
     }
 
-    print();
-    buildPath(current);
+    print(false, expanded);
+    int pathLength = buildPath(current);
     cout << "Press enter to continue..." << endl;
     getline(cin, s);
-    print(true);
+    print(true, expanded, pathLength);
 }
 
-void Maze::buildPath(Tile &endTile) const
+int Maze::buildPath(Tile &endTile) const
 {
+    int pathlength = 1;
     Tile * tilePtr = endTile.getExpandedBy();
 
     while (tilePtr->getState() != TileEnum::START){
+        pathlength++;
         tilePtr->setState(TileEnum::PATH);
         tilePtr = tilePtr->getExpandedBy();
     }
+
+    return pathlength;
 }

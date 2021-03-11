@@ -47,11 +47,16 @@ public:
 
     unsigned int getYPos() const;
 
+    unsigned int getDistanceFromStart() const;
+
+    void setDistanceFromStart(unsigned int distance);
+
 private:
     Tile * expandedBy = nullptr;
     vector<reference_wrapper<Tile>> neighbours;
     unsigned int xPos;
     unsigned int yPos;
+    unsigned int distanceFromStart = 0;
     TileEnum state;
 };
 

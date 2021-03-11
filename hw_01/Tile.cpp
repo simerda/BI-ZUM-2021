@@ -97,3 +97,13 @@ unsigned int Tile::getYPos() const
 {
     return yPos;
 }
+
+unsigned int Tile::getDistanceFromStart() const
+{
+    return distanceFromStart;
+}
+
+void Tile::setDistanceFromStart(unsigned int distance)
+{
+    distanceFromStart = distance;
+}
