@@ -26,7 +26,18 @@ for ($i = 0; $i < NUMBER_OF_QUEENS; $i++) {
     }
 
     /** @noinspection RandomApiMigrationInspection */
-    $chessboard[$i][\mt_rand(0, NUMBER_OF_QUEENS - 1)] = true;
+    //$chessboard[$i][$i/*\mt_rand(0, NUMBER_OF_QUEENS - 1)*/] = true;
+}
+
+for($i = 0; $i < NUMBER_OF_QUEENS; $i++){
+    $randX = mt_rand(0, NUMBER_OF_QUEENS - 1);
+    $randY = mt_rand(0, NUMBER_OF_QUEENS - 1);
+    if($chessboard[$randY][$randX]){
+        $i--;
+        continue;
+    }
+
+    $chessboard[$randY][$randX] = true;
 }
 
 main($chessboard);
@@ -208,7 +219,7 @@ function main(array $chessboard): void
     echo "Starting temperature: ${temp}" . PHP_EOL;
 
     $iterations = 0;
-    while ($score > $targetScore && $temp > 0) {
+    while ($score > $targetScore && $temp >= 1) {
         $iterations++;
 
         $candidate = randomChange($chessboard);
