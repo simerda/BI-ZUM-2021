@@ -12,7 +12,7 @@ if (!\ctype_digit($argv[1])) {
     die('Argument must be positive number.' . PHP_EOL);
 }
 
-define('NUMBER_OF_QUEENS', (int)$argv[1]);
+define('NUMBER_OF_QUEENS', (int) $argv[1]);
 const INITIAL_TEMP = 14;
 
 // initialize chessboard with pseudo-random queen placement
@@ -78,8 +78,7 @@ function score(array $chessboard): int
 {
     $score = 0;
 
-    // count per rows
-    $row = 0;
+    // count over rows
     foreach ($chessboard as $line) {
         $lineCount = 0;
         foreach ($line as $queen) {
@@ -90,7 +89,7 @@ function score(array $chessboard): int
         $score += $lineCount * $lineCount;
     }
 
-    // count per columns
+    // count over columns
     for ($x = 0; $x < NUMBER_OF_QUEENS; $x++) {
         $lineCount = 0;
         for ($y = 0; $y < NUMBER_OF_QUEENS; $y++) {
@@ -101,7 +100,7 @@ function score(array $chessboard): int
         $score += $lineCount * $lineCount;
     }
 
-    // count per main diagonal
+    // count over main diagonal
     for ($num = 0; $num < (NUMBER_OF_QUEENS * 2) - 1; $num++) {
         $y = min($num, NUMBER_OF_QUEENS - 1);
         $x = $num < NUMBER_OF_QUEENS ? NUMBER_OF_QUEENS - 1 : $num - NUMBER_OF_QUEENS;
@@ -118,7 +117,7 @@ function score(array $chessboard): int
         $score += $lineCount * $lineCount;
     }
 
-    // count per counter diagonal
+    // count over counter diagonal
     for ($num = 0; $num < (NUMBER_OF_QUEENS * 2) - 1; $num++) {
         $y = min($num, NUMBER_OF_QUEENS - 1);
         $x = $num < NUMBER_OF_QUEENS ? 0 : 2 * NUMBER_OF_QUEENS - $num - 1;
@@ -248,10 +247,4 @@ function main(array $chessboard): void
         printChessboard($bestCandidate);
     }
 }
-
-
-
-
-
-
 
