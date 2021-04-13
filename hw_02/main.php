@@ -13,6 +13,7 @@ if (!\ctype_digit($argv[1])) {
 }
 
 define('NUMBER_OF_QUEENS', (int)$argv[1]);
+const INITIAL_TEMP = 14;
 
 // initialize chessboard with pseudo-random queen placement
 // (each queen is on separate row, but column is selected randomly)
@@ -26,18 +27,7 @@ for ($i = 0; $i < NUMBER_OF_QUEENS; $i++) {
     }
 
     /** @noinspection RandomApiMigrationInspection */
-    //$chessboard[$i][$i/*\mt_rand(0, NUMBER_OF_QUEENS - 1)*/] = true;
-}
-
-for($i = 0; $i < NUMBER_OF_QUEENS; $i++){
-    $randX = mt_rand(0, NUMBER_OF_QUEENS - 1);
-    $randY = mt_rand(0, NUMBER_OF_QUEENS - 1);
-    if($chessboard[$randY][$randX]){
-        $i--;
-        continue;
-    }
-
-    $chessboard[$randY][$randX] = true;
+    $chessboard[$i][\mt_rand(0, NUMBER_OF_QUEENS - 1)] = true;
 }
 
 main($chessboard);
@@ -160,7 +150,7 @@ function randomChange(array $chessboard): array
 
             // probability of move is 1/NUMBER_OF_QUEENS for each queen
             /** @noinspection RandomApiMigrationInspection */
-            if (!$chessboard[$y][$x] || mt_rand(1, NUMBER_OF_QUEENS) > 3) {
+            if (!$chessboard[$y][$x] || mt_rand(1, NUMBER_OF_QUEENS) > 1) {
                 continue;
             }
 
@@ -206,21 +196,30 @@ function probabilityFunc(int $currentScore, int $candidateScore, int $temp): flo
 
 
 /**
+ * @param int $cycle
+ * @return float
+ */
+function cool(int $cycle): float
+{
+    return INITIAL_TEMP / (1 + log(1 + $cycle));
+}
+
+
+/**
  * @param bool[][] $chessboard
  */
 function main(array $chessboard): void
 {
     $targetScore = 4 * NUMBER_OF_QUEENS;
-    $temp = 10000000;
     $score = score($chessboard);
     $bestCandidate = $chessboard;
     $bestScore = $score;
+    $temp = INITIAL_TEMP;
 
     echo "Starting temperature: ${temp}" . PHP_EOL;
 
     $iterations = 0;
     while ($score > $targetScore && $temp >= 1) {
-        $iterations++;
 
         $candidate = randomChange($chessboard);
         $candidateScore = score($candidate);
@@ -235,8 +234,7 @@ function main(array $chessboard): void
             $score = $candidateScore;
         }
 
-        //$temp -= 10;
-        $temp = $temp / 1.00001 - 1;
+        $temp = cool($iterations++);
     }
 
     if ($score <= $targetScore) {
