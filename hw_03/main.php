@@ -79,7 +79,10 @@ function readAgents(array $vertices): array
     $agents = [];
     $vertexCount = \count($vertices);
     $agentRegex = '/^[a-z][a-z0-9]*$/';
-    for($i = 0; $i < $vertexCount && !empty($agent = input()); $i++){
+    for($i = 0; $i < $vertexCount; $i++){
+        if(empty($agent = input())){
+            break;
+        }
 
         if(\preg_match($agentRegex, $agent) !== 1){
             die('Agent name must consist only of lowercase characters and digits. '.
@@ -107,7 +110,7 @@ function readAgentPlaces(array $agents, array $vertices): array
         $vertex = input();
 
         if(! in_array($vertex, $vertices, true)){
-            die('Vertex not found' . PHP_EOL);
+            die("Vertex \"${vertex}\" not found" . PHP_EOL);
         }
 
         if(in_array($vertex, $agents, true)){
