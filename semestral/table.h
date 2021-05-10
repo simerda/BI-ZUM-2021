@@ -24,13 +24,6 @@ using std::make_pair;
 using std::string_literals::operator ""s;
 using std::to_string;
 
-enum class GameStage {
-    PRE_FLOP,
-    FLOP,
-    TURN,
-    RIVER,
-};
-
 class Table {
 public:
 
@@ -210,13 +203,15 @@ public:
                         && (playerRaised != playerOnTurn || noOneRaised);
 
         unsigned int response = players[playerOnTurn]->promptForBet(
+                gameStage,
                 bet,
                 canCheck,
                 canRaise,
                 players[playerOnTurn]->monteCarloSimulation(
                         tableCards,
                         players.size() - 1 - foldedCount
-                )
+                ),
+                potAmount
         );
         if (response > bet) {
             playerRaised = playerOnTurn;
