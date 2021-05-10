@@ -21,10 +21,10 @@ using std::string;
 using std::pair;
 using std::map;
 using std::make_pair;
-using std::string_literals::operator""s;
+using std::string_literals::operator ""s;
 using std::to_string;
 
-enum class GameStage{
+enum class GameStage {
     PRE_FLOP,
     FLOP,
     TURN,
@@ -34,13 +34,13 @@ enum class GameStage{
 class Table {
 public:
 
-    Table(): deck(CardFactory::makeShuffledDeck())
+    Table() : deck(CardFactory::makeShuffledDeck())
     {
     }
 
     ~Table()
     {
-        for(const auto player : players){
+        for (const auto player : players) {
             delete player;
         }
     }
@@ -52,32 +52,32 @@ public:
 
     void startGame()
     {
-        for(int i = 0; i < (int) players.size(); i++){
-            if(players[i]->getBalance() < BIG_BLIND){
+        for (int i = 0; i < (int) players.size(); i++) {
+            if (players[i]->getBalance() < BIG_BLIND) {
                 cout << "Kicking player " << players[i]->getName() << " as he doesn't have sufficient balance." << endl;
                 i--;
             }
         }
 
 
-        do{
-            if(players.size() < 2 || players.size() > 10){
+        do {
+            if (players.size() < 2 || players.size() > 10) {
                 throw runtime_error("Invalid player count: "s + to_string(players.size()) + ".");
             }
             smallBlind = smallBlind % players.size();
             cout << "Player " << players[smallBlind]->getName() << " is small blind." << endl;
-            cout << "Player " << players[(smallBlind+1) % players.size()]->getName() << " is big blind." << endl;
+            cout << "Player " << players[(smallBlind + 1) % players.size()]->getName() << " is big blind." << endl;
 
             startRound();
             evaluateRound();
             smallBlind++;
-        }while(shouldContinue());
+        } while (shouldContinue());
 
     }
 
     void startRound()
     {
-        tableCards = vector<AbstractCard*>{};
+        tableCards = vector<AbstractCard *>{};
         foldedCount = 0;
         potAmount = SMALL_BLIND + BIG_BLIND;
         playerOnTurn = smallBlind;
@@ -87,14 +87,13 @@ public:
         betAmount = BIG_BLIND;
         players[playerOnTurn]->bet(BIG_BLIND);
         bets = map<Player *, unsigned int>{
-            make_pair(players[playerOnTurn], BIG_BLIND),
-            make_pair(players[smallBlind], SMALL_BLIND)
+                make_pair(players[playerOnTurn], BIG_BLIND),
+                make_pair(players[smallBlind], SMALL_BLIND)
         };
 
         gameStage = GameStage::PRE_FLOP;
         deck = CardFactory::makeShuffledDeck();
-        for(Player *player : players)
-        {
+        for (Player *player : players) {
             player->setCards(deck.back(), deck.at(deck.size() - 2));
             deck.pop_back();
             deck.pop_back();
@@ -102,7 +101,7 @@ public:
         requestBets();
 
         gameStage = GameStage::FLOP;
-        for(uint8_t i = 0; i < 3; i++){
+        for (uint8_t i = 0; i < 3; i++) {
             tableCards.push_back(deck.back());
             deck.pop_back();
         }
@@ -121,46 +120,46 @@ public:
 
     void requestBets()
     {
-        if(foldedCount >= players.size() - 1){
+        if (foldedCount >= players.size() - 1) {
             return;
         }
 
         playerOnTurn = smallBlind;
         advancePlayer(2);
         bool noOneRaised = true;
-        do{
+        do {
             // skip folded/all in players
-            if((players[playerOnTurn]->getAtStake() == 0 || players[playerOnTurn]->getBalance()) == 0
-            && gameStage != GameStage::PRE_FLOP){
+            if ((players[playerOnTurn]->getAtStake() == 0 || players[playerOnTurn]->getBalance()) == 0
+                && gameStage != GameStage::PRE_FLOP) {
                 continue;
             }
 
             printTable();
             auto prevBetAmount = betAmount;
-            if(promptPlayer(betAmount, noOneRaised)){
+            if (promptPlayer(betAmount, noOneRaised)) {
                 auto iterator = bets.insert(make_pair(players[playerOnTurn], 0)).first;
                 potAmount += players[playerOnTurn]->getAtStake() - iterator->second;
                 iterator->second = players[playerOnTurn]->getAtStake();
-            }else{
+            } else {
                 // folded
                 foldedCount++;
-                if(foldedCount >= players.size() - 1){
+                if (foldedCount >= players.size() - 1) {
                     break;
                 }
             }
 
-            if(prevBetAmount < betAmount){
+            if (prevBetAmount < betAmount) {
                 noOneRaised = false;
             }
 
             advancePlayer();
 
-            if(playerOnTurn == playerRaised && noOneRaised){
+            if (playerOnTurn == playerRaised && noOneRaised && gameStage == GameStage::PRE_FLOP) {
                 playerRaised = (playerRaised + 1) % players.size();
                 noOneRaised = false;
             }
 
-        }while(playerOnTurn != playerRaised);
+        } while (playerOnTurn != playerRaised);
 
     }
 
@@ -168,8 +167,8 @@ public:
     bool shouldContinue()
     {
         assertBalances();
-        if(players.size() < 2){
-            if(! players.empty()){
+        if (players.size() < 2) {
+            if (!players.empty()) {
                 cout << "Player " << players.front()->getName() << " won." << endl;
             }
             cout << "Ending game." << endl;
@@ -177,20 +176,20 @@ public:
         }
 
         string response;
-        do{
+        do {
             cin.clear();
             cout << "Would you like to continue with another round? (y/n)" << endl;
-        }while(!(cin >> response) || (response != "y" && response != "n"));
+        } while (!(cin >> response) || (response != "y" && response != "n"));
 
         return response == "y";
     }
 
     void assertBalances()
     {
-        for(int i = 0; i < (int) players.size(); i++){
-            if(players[i]->getBalance() < BIG_BLIND){
+        for (int i = 0; i < (int) players.size(); i++) {
+            if (players[i]->getBalance() < BIG_BLIND) {
                 cout << "Kicking player " << players[i]->getName()
-                << " as he doesn't sufficient balance." << endl;
+                     << " as he doesn't sufficient balance." << endl;
                 players.erase(players.begin() + i);
                 i--;
             }
@@ -209,8 +208,16 @@ public:
                         && players[playerOnTurn]->getAtStake() + players[playerOnTurn]->getBalance() > bet
                         && (playerRaised != playerOnTurn || noOneRaised);
 
-        unsigned int response = players[playerOnTurn]->promptForBet(bet, canCheck, canRaise);
-        if(response > bet){
+        unsigned int response = players[playerOnTurn]->promptForBet(
+                bet,
+                canCheck,
+                canRaise,
+                players[playerOnTurn]->monteCarloSimulation(
+                        tableCards,
+                        players.size() - 1 - foldedCount
+                )
+        );
+        if (response > bet) {
             playerRaised = playerOnTurn;
             bet = response;
             return true;
@@ -221,12 +228,12 @@ public:
 
     void printTable() const
     {
-        if(tableCards.empty()){
+        if (tableCards.empty()) {
             return;
         }
         vector<string> cards;
         cards.reserve(tableCards.size());
-        for(const AbstractCard *card : tableCards){
+        for (const AbstractCard *card : tableCards) {
             cards.push_back(card->toString());
         }
         cout << "-----------------------------------------------" << endl;
@@ -234,13 +241,13 @@ public:
         size_t len = cards.empty() ? 0 : cards.front().length();
         size_t currI = 0;
 
-        for(uint8_t n = 0; n < cards.size() && currI < len; n = (n + 1) % cards.size()){
-            for(size_t i = currI; i < len; i++){
+        for (uint8_t n = 0; n < cards.size() && currI < len; n = (n + 1) % cards.size()) {
+            for (size_t i = currI; i < len; i++) {
 
-                if(cards[n][i] == '\n'){
-                    if(n + 1 < (int) cards.size()){
+                if (cards[n][i] == '\n') {
+                    if (n + 1 < (int) cards.size()) {
                         cout << "   ";
-                    }else{
+                    } else {
                         cout << endl;
                         currI = i + 1;
                     }
@@ -257,48 +264,50 @@ public:
     void evaluateRound()
     {
         vector<pair<Player *, unsigned int>> ranking;
-        for(Player *player : players){
+        for (Player *player : players) {
             // folded
-            if(player->getAtStake() == 0){
+            if (player->getAtStake() == 0) {
                 continue;
             }
             ranking.emplace_back(player, player->rankHand(tableCards));
         }
 
-        sort(ranking.begin(), ranking.end(), [](const pair<Player *, unsigned int> &a, const pair<Player *, unsigned int> &b){
-            return b.second < a.second;
-        });
+        sort(ranking.begin(), ranking.end(),
+             [](const pair<Player *, unsigned int> &a, const pair<Player *, unsigned int> &b) {
+                 return b.second < a.second;
+             });
 
         uint8_t nextWinner = 0;
-        while(potAmount > 0){
+        while (potAmount > 0) {
             vector<Player *> winners;
             unsigned int rank = ranking[nextWinner].second;
-            while(nextWinner < ranking.size() && ranking[nextWinner].second == rank){
+            while (nextWinner < ranking.size() && ranking[nextWinner].second == rank) {
                 winners.push_back(ranking[nextWinner++].first);
             }
 
             unsigned int won = 0;
-            for(Player *player : winners){
+            for (Player *player : winners) {
                 unsigned int playerBetAmount = bets.find(player)->second;
 
-                for(auto &betPair : bets){
-                    unsigned int applicableAmount = playerBetAmount >= betPair.second ? betPair.second : playerBetAmount;
+                for (auto &betPair : bets) {
+                    unsigned int applicableAmount =
+                            playerBetAmount >= betPair.second ? betPair.second : playerBetAmount;
                     betPair.second -= applicableAmount;
                     won += applicableAmount;
                     potAmount -= applicableAmount;
                 }
             }
 
-            for(Player *player : winners)
-            {
+            for (Player *player : winners) {
                 unsigned int playerWon = won / winners.size();
-                cout << "Player " << player->getName() << " won " << playerWon - player->getAtStake() << " coins." << endl;
+                cout << "Player " << player->getName() << " won " << playerWon - player->getAtStake() << " coins."
+                     << endl;
                 player->addBalance(playerWon);
             }
 
         }
 
-        for(Player *player : players){
+        for (Player *player : players) {
             player->setAtStake(0);
         }
     }
@@ -313,8 +322,8 @@ private:
     uint8_t smallBlind = 0;
     uint8_t playerRaised = 0;
     GameStage gameStage = GameStage::PRE_FLOP;
-    vector<AbstractCard*> deck;
-    vector<AbstractCard*> tableCards;
+    vector<AbstractCard *> deck;
+    vector<AbstractCard *> tableCards;
     map<Player *, unsigned int> bets;
     unsigned int potAmount = 0;
     unsigned int betAmount = 0;

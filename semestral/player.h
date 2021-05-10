@@ -8,7 +8,9 @@
 
 #include <string>
 #include <utility>
+#include <vector>
 #include <iostream>
+#include <iomanip>
 #include "hand.h"
 
 using std::string;
@@ -16,6 +18,8 @@ using std::move;
 using std::cin;
 using std::cout;
 using std::endl;
+using std::fixed;
+using std::setprecision;
 
 class Player {
 public:
@@ -43,12 +47,12 @@ public:
         atStake = value;
     }
 
-    unsigned int promptForBet(unsigned int currBet, bool canCheck, bool canRaise)
+    unsigned int promptForBet(unsigned int currBet, bool canCheck, bool canRaise, double prob)
     {
         cout << getName() << "'s turn: " << endl;
         printHand();
         cout << "The bet is " << currBet << ". You have " << getAtStake() << " coins at stake. Your balance is " << getBalance() << " coins." << endl;
-
+        cout << "Your probability to win is " << fixed << setprecision(2) << prob * 100 << "%." << endl;
 
         string response;
         do{
@@ -129,6 +133,62 @@ public:
         atStake += amount;
     }
 
+    double monteCarloSimulation(const vector<AbstractCard *> &tableCards, uint8_t numberOfOpponents)
+    {
+        unsigned int simulations = (numberOfOpponents + 1) * SIMULATIONS_PER_PLAYER;
+        unsigned int wins = 0;
+        vector<AbstractCard *> dummyDeck = CardFactory::makeDeck();
+
+        // remove already used
+        for(int i = 0; i < (int) dummyDeck.size(); i++){
+            bool equal = false;
+            for(AbstractCard *tableCard : tableCards){
+                if(dummyDeck[i]->equal(tableCard)){
+                    equal = true;
+                    break;
+                }
+            }
+
+            if(equal || dummyDeck[i]->equal(hand.getCards().first) || dummyDeck[i]->equal(hand.getCards().second)){
+                dummyDeck.erase(dummyDeck.begin() + i);
+                i--;
+            }
+        }
+
+        for(size_t i = 0; i < simulations; i++){
+            CardFactory::shuffleDeck(dummyDeck);
+            size_t deckIndex = 0;
+
+            // complete table cards
+            vector<AbstractCard *> tableCardsCopy(tableCards);
+            while(tableCardsCopy.size() < 5){
+                tableCardsCopy.push_back(dummyDeck[deckIndex++]);
+            }
+
+            int myRanking = hand.rankHand(tableCardsCopy);
+            bool lost = false;
+
+            // make opponent hands
+            vector<Hand> opponents;
+            opponents.resize(numberOfOpponents);
+            for(Hand &opponent : opponents){
+                AbstractCard *card1 = dummyDeck[deckIndex++];
+                AbstractCard *card2 = dummyDeck[deckIndex++];
+                opponent.setCards(card1, card2);
+                if(opponent.rankHand(tableCardsCopy) > myRanking){
+                    lost = true;
+                    break;
+                }
+            }
+
+            if(! lost){
+                wins++;
+            }
+        }
+
+        return wins / (double) simulations;
+    }
+
 
 private:
     static unsigned int promptRange(unsigned int from, unsigned int to)
@@ -147,7 +207,10 @@ private:
     Hand hand;
     unsigned int balance = 0;
     unsigned int atStake = 0;
+
+    static const unsigned int SIMULATIONS_PER_PLAYER;
 };
 
+const unsigned int Player::SIMULATIONS_PER_PLAYER = 2000;
 
 #endif //SEMESTRAL_PLAYER_H

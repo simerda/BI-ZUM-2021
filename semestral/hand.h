@@ -239,6 +239,11 @@ public:
         cout << endl;
     }
 
+    const pair<AbstractCard *, AbstractCard *> &getCards() const
+    {
+        return cards;
+    }
+
 private:
 
     bool resolveCards(const vector<AbstractCard *> &boardCards)

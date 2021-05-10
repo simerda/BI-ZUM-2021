@@ -56,6 +56,11 @@ public:
         return value;
     }
 
+    bool equal(const AbstractCard *other) const
+    {
+        return color == other->color && value == other->value;
+    }
+
     virtual string toString() const
     {
         string valueStr = AbstractCard::valueToString(value);
@@ -659,6 +664,12 @@ public:
     static vector<AbstractCard *> makeShuffledDeck()
     {
         auto deck = makeDeck();
+        shuffleDeck(deck);
+        return deck;
+    }
+
+    static void shuffleDeck(vector<AbstractCard *> &deck)
+    {
         shuffle(
                 deck.begin(),
                 deck.end(),
@@ -666,7 +677,6 @@ public:
                         std::chrono::system_clock::now().time_since_epoch().count()
                 )
         );
-        return deck;
     }
 };
 

@@ -15,9 +15,5 @@ int main()
     table.addPlayer(Player("Player 2", 200));
     table.startGame();
 
-
-
-
-
     return 0;
 }
