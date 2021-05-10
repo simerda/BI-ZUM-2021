@@ -131,6 +131,7 @@ public:
             // skip folded/all in players
             if ((players[playerOnTurn]->getAtStake() == 0 || players[playerOnTurn]->getBalance()) == 0
                 && gameStage != GameStage::PRE_FLOP) {
+                advancePlayer();
                 continue;
             }
 
