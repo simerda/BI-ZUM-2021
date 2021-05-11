@@ -146,12 +146,12 @@ public:
 
     static double mutate(double value)
     {
-        if((rand() % 100) != 0){
+        if((rand() % 10) != 0){
             return value;
         }
 
         double shift = rand() / double(RAND_MAX);
-        shift /= 10; // number between 0 and 0.1
+        shift /= 2; // number between 0 and 0.5
         if((rand() % 2) == 0){
             value += shift;
         }else{
@@ -189,7 +189,7 @@ private:
 };
 
 std::default_random_engine Agent::engine(std::chrono::system_clock::now().time_since_epoch().count());
-std::uniform_real_distribution<> Agent::dis(0, 2);
+std::uniform_real_distribution<> Agent::dis(1, 3);
 
 
 #endif //SEMESTRAL_AGENT_H
