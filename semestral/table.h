@@ -43,15 +43,46 @@ public:
         players.push_back(new Player(player));
     }
 
+    unsigned int train(unsigned int rounds)
+    {
+        for(size_t n = 0; n < rounds; n++){
+
+            for (int i = 0; i < (int) players.size(); i++) {
+                if (players[i]->getBalance() < BIG_BLIND) {
+
+                    // trained player lost
+                    if(i == 0){
+                        return players[0]->getScore();
+                    }
+
+                    players.erase(players.begin() + i);
+                    i--;
+
+                }
+                players[i]->incrementScore();
+            }
+
+            if (players.size() < 2 || players.size() > 10) {
+                return 0;
+            }
+            smallBlind = smallBlind % players.size();
+            startRound(false);
+            evaluateRound(false);
+            smallBlind++;
+        }
+
+        return players[0]->getScore();
+    }
+
     void startGame()
     {
         for (int i = 0; i < (int) players.size(); i++) {
             if (players[i]->getBalance() < BIG_BLIND) {
                 cout << "Kicking player " << players[i]->getName() << " as he doesn't have sufficient balance." << endl;
+                players.erase(players.begin() + i);
                 i--;
             }
         }
-
 
         do {
             if (players.size() < 2 || players.size() > 10) {
@@ -68,7 +99,7 @@ public:
 
     }
 
-    void startRound()
+    void startRound(bool verbose = true)
     {
         tableCards = vector<AbstractCard *>{};
         foldedCount = 0;
@@ -91,27 +122,27 @@ public:
             deck.pop_back();
             deck.pop_back();
         }
-        requestBets();
+        requestBets(verbose);
 
         gameStage = GameStage::FLOP;
         for (uint8_t i = 0; i < 3; i++) {
             tableCards.push_back(deck.back());
             deck.pop_back();
         }
-        requestBets();
+        requestBets(verbose);
 
         gameStage = GameStage::TURN;
         tableCards.push_back(deck.back());
         deck.pop_back();
-        requestBets();
+        requestBets(verbose);
 
         gameStage = GameStage::RIVER;
         tableCards.push_back(deck.back());
         deck.pop_back();
-        requestBets();
+        requestBets(verbose);
     }
 
-    void requestBets()
+    void requestBets(bool verbose = true)
     {
         if (foldedCount >= players.size() - 1) {
             return;
@@ -128,9 +159,11 @@ public:
                 continue;
             }
 
-            printTable();
+            if(verbose){
+                printTable();
+            }
             auto prevBetAmount = betAmount;
-            if (promptPlayer(betAmount, noOneRaised)) {
+            if (promptPlayer(betAmount, noOneRaised, verbose)) {
                 auto iterator = bets.insert(make_pair(players[playerOnTurn], 0)).first;
                 potAmount += players[playerOnTurn]->getAtStake() - iterator->second;
                 iterator->second = players[playerOnTurn]->getAtStake();
@@ -195,7 +228,7 @@ public:
         playerOnTurn = (playerOnTurn + positions) % players.size();
     }
 
-    bool promptPlayer(unsigned int &bet, bool noOneRaised)
+    bool promptPlayer(unsigned int &bet, bool noOneRaised, bool verbose = true)
     {
         bool canCheck = players[playerOnTurn]->getAtStake() >= bet;
         bool canRaise = players[playerOnTurn]->getBalance() > 0
@@ -211,7 +244,8 @@ public:
                         tableCards,
                         players.size() - 1 - foldedCount
                 ),
-                potAmount
+                potAmount,
+                verbose
         );
         if (response > bet) {
             playerRaised = playerOnTurn;
@@ -257,7 +291,7 @@ public:
         cout << "-----------------------------------------------" << endl;
     }
 
-    void evaluateRound()
+    void evaluateRound(bool verbose = true)
     {
         vector<pair<Player *, unsigned int>> ranking;
         for (Player *player : players) {
@@ -296,8 +330,10 @@ public:
 
             for (Player *player : winners) {
                 unsigned int playerWon = won / winners.size();
-                cout << "Player " << player->getName() << " won " << playerWon - player->getAtStake() << " coins."
-                     << endl;
+                if(verbose){
+                    cout << "Player " << player->getName() << " won " << playerWon - player->getAtStake() << " coins."
+                         << endl;
+                }
                 player->addBalance(playerWon);
             }
 

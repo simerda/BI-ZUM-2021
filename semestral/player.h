@@ -29,6 +29,30 @@ public:
     {
     }
 
+    Player(const Player &other)
+            : name(other.name), startingBalance(other.startingBalance), balance(other.balance)
+    {
+        if(other.agent != nullptr){
+            agent = new Agent(*other.agent);
+        }
+    }
+
+    Player& operator=(const Player& other)
+    {
+        if(this == &other){
+            return *this;
+        }
+
+        name = other.name;
+        startingBalance = other.startingBalance;
+        balance = other.balance;
+        if(other.agent != nullptr){
+            agent = new Agent(*other.agent);
+        }
+
+        return *this;
+    }
+
     const string &getName() const
     {
         return name;
@@ -50,13 +74,16 @@ public:
     }
 
     unsigned int promptForBet(GameStage stage, unsigned int currBet, bool canCheck, bool canRaise, double prob,
-                              unsigned int potAmount)
+                              unsigned int potAmount, bool verbose = true)
     {
-        cout << getName() << "'s turn: " << endl;
-        printHand();
-        cout << "The bet is " << currBet << ". You have " << getAtStake() << " coins at stake. Your balance is "
-             << getBalance() << " coins." << endl;
-        cout << "Your probability to win is " << fixed << setprecision(2) << prob * 100 << "%." << endl;
+        if(verbose){
+
+            cout << getName() << "'s turn: " << endl;
+            printHand();
+            cout << "The bet is " << currBet << ". You have " << getAtStake() << " coins at stake. Your balance is "
+                 << getBalance() << " coins." << endl;
+            cout << "Your probability to win is " << fixed << setprecision(2) << prob * 100 << "%." << endl;
+        }
 
         if (agent != nullptr) {
 
@@ -69,11 +96,15 @@ public:
                     potAmount,
                     prob
             );
-            cout << "Predicted bet is " << predictedBet << " coins." << endl;
+            if(verbose){
+                cout << "Predicted bet is " << predictedBet << " coins." << endl;
+            }
 
             // fold
             if(predictedBet < currBet){
-                cout << "Player folded." << endl;
+                if(verbose){
+                    cout << "Player folded." << endl;
+                }
                 atStake = 0;
                 return 0;
             }
@@ -81,13 +112,19 @@ public:
             // check or raise
             if(balance + atStake >= predictedBet){
                 if(predictedBet == currBet){
-                    if(atStake < currBet){
-                        cout << "Player called." << endl;
+                    if(atStake < currBet && verbose){
+                        if(verbose){
+                            cout << "Player called." << endl;
+                        }
                     }else{
-                        cout << "Player checked." << endl;
+                        if(verbose){
+                            cout << "Player checked." << endl;
+                        }
                     }
                 }else{
-                    cout << "Player raised to " << predictedBet << "." << endl;
+                    if(verbose){
+                        cout << "Player raised to " << predictedBet << "." << endl;
+                    }
                 }
 
                 unsigned int diff = currBet - atStake;
@@ -238,6 +275,19 @@ public:
         return wins / (double) simulations;
     }
 
+    void incrementScore()
+    {
+        score++;
+    }
+
+    unsigned int getScore() const
+    {
+        if(balance < 10){
+            return score;
+        }
+        return score + balance;
+    }
+
 
 private:
     static unsigned int promptRange(unsigned int from, unsigned int to)
@@ -258,10 +308,11 @@ private:
     unsigned int balance = 0;
     Agent *agent = nullptr;
     unsigned int atStake = 0;
+    unsigned int score = 0;
 
     static const unsigned int SIMULATIONS_PER_PLAYER;
 };
 
-const unsigned int Player::SIMULATIONS_PER_PLAYER = 2000;
+const unsigned int Player::SIMULATIONS_PER_PLAYER = 500;
 
 #endif //SEMESTRAL_PLAYER_H

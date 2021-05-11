@@ -66,7 +66,7 @@ public:
         }
 
         if(! file.good()){
-            throw runtime_error("Failed to load agent from file.");
+            throw runtime_error("Failed to load agent from file " + filename + ".");
         }
 
         return Agent(allParams, generation);
@@ -122,6 +122,54 @@ public:
         return predictedBet;
     }
 
+    static Agent crossbreed(const Agent &firstParent, const Agent &secondParent)
+    {
+        map<GameStage, Params> paramsMap;
+        vector<GameStage> stages{GameStage::PRE_FLOP, GameStage::FLOP, GameStage::TURN, GameStage::RIVER};
+
+        for(GameStage stage : stages){
+
+            const Params &firstParentParams = firstParent.stageToParams.find(stage)->second;
+            const Params &secondParentParams = secondParent.stageToParams.find(stage)->second;
+
+            Params param{};
+            int count = 0;
+            int owns = rand() % 4;
+            param.probWeight = mutate((count++ < owns ? firstParentParams : secondParentParams).probWeight);
+            param.balanceWeight = mutate((count++ < owns ? firstParentParams : secondParentParams).balanceWeight);
+            param.threshold = mutate((count++ < owns ? firstParentParams : secondParentParams).threshold);
+
+            paramsMap.insert(make_pair(stage, param));
+        }
+        return Agent(paramsMap, firstParent.generation+1);
+    }
+
+    static double mutate(double value)
+    {
+        if((rand() % 100) != 0){
+            return value;
+        }
+
+        double shift = rand() / double(RAND_MAX);
+        shift /= 10; // number between 0 and 0.1
+        if((rand() % 2) == 0){
+            value += shift;
+        }else{
+            value -= shift;
+        }
+
+        return value < 0 ? value + shift : value;
+    }
+
+    void incrementGeneration()
+    {
+        generation++;
+    }
+
+    size_t getGeneration() const
+    {
+        return generation;
+    }
 
 private:
     explicit Agent(map<GameStage, Params> params, size_t generationParam = 0)
@@ -141,7 +189,7 @@ private:
 };
 
 std::default_random_engine Agent::engine(std::chrono::system_clock::now().time_since_epoch().count());
-std::uniform_real_distribution<> Agent::dis(0, 1);
+std::uniform_real_distribution<> Agent::dis(0, 2);
 
 
 #endif //SEMESTRAL_AGENT_H
