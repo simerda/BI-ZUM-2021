@@ -146,19 +146,19 @@ public:
 
     static double mutate(double value)
     {
-        if((rand() % 10) != 0){
+        if((rand() % 100) != 0){
             return value;
         }
 
         double shift = rand() / double(RAND_MAX);
-        shift /= 2; // number between 0 and 0.5
+        shift /= 20; // number between 0 and 0.05
         if((rand() % 2) == 0){
             value += shift;
         }else{
             value -= shift;
         }
 
-        return value < 0 ? value + shift : value;
+        return (value < 0 ? value + shift : value);
     }
 
     void incrementGeneration()

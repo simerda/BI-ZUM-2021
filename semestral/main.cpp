@@ -34,8 +34,8 @@ int play(const vector<Player> &players)
 
 void crossbreed(vector<Agent> &population, unsigned int populationSize)
 {
-    Agent &firstParent = population[0];
-    Agent &secondParent = population[1];
+    Agent firstParent = population[0];
+    Agent secondParent = population[1];
 
     while(population.size() < populationSize){
         population.push_back(Agent::crossbreed(firstParent, secondParent));
@@ -45,7 +45,7 @@ void crossbreed(vector<Agent> &population, unsigned int populationSize)
     secondParent.incrementGeneration();
 }
 
-int train(vector<Agent> &opponents, unsigned int populationSize, unsigned int generations)
+Agent train(vector<Agent> &opponents, unsigned int populationSize, unsigned int generations)
 {
     vector<Agent> population{opponents.front()};
     opponents.erase(opponents.begin());
@@ -67,16 +67,12 @@ int train(vector<Agent> &opponents, unsigned int populationSize, unsigned int ge
                 table.addPlayer(Player("", STARTING_BALANCE, &opponent));
             }
 
-            fitness.emplace_back(ref(population[i]), table.train(100));
+            fitness.emplace_back(ref(population[i]), table.train(30));
             fitnessSum += fitness.back().second;
             cout << "Individual no. " << i << " fitness: " << fitness.back().second << endl;
         }
 
         double averageFitness = (double) fitnessSum / populationSize;
-
-        // roulette selection
-        //unsigned int selection = rand() % fitnessSum;
-        //unsigned int sum = 0;
 
         sort(fitness.begin(), fitness.end(), [](
                 const pair<reference_wrapper<Agent>,unsigned int> &a,
@@ -92,25 +88,6 @@ int train(vector<Agent> &opponents, unsigned int populationSize, unsigned int ge
 
         reference_wrapper<Agent> firstParent = fitness[populationSize - 1].first;
         reference_wrapper<Agent> secondParent = fitness[populationSize - 2].first;
-        //for(unsigned int i = 0; i < fitness.size(); i++){
-        //    if(selection >= sum && selection < sum + fitness[i].second){
-        //        firstParent = fitness[i].first;
-        //        fitnessSum -= fitness[i].second;
-        //                fitness.erase(fitness.begin() + i);
-        //        break;
-        //    }
-        //    sum += fitness[i].second;
-        //}
-
-        //selection = rand() % fitnessSum;
-        //sum = 0;
-        //for(auto & fitnessPair : fitness){
-        //    if(selection >= sum && selection < sum + fitnessPair.second){
-        //        secondParent = fitnessPair.first;
-        //        break;
-        //    }
-        //    sum += fitnessPair.second;
-        //}
 
         cout << "Minimum fitness: " << minFitness << endl;
         cout << "Maximum fitness: " << maxFitness << endl;
@@ -121,7 +98,7 @@ int train(vector<Agent> &opponents, unsigned int populationSize, unsigned int ge
         crossbreed(population, populationSize);
     }
 
-    return 0;
+    return population.front();
 }
 
 
@@ -195,7 +172,8 @@ int main(int argc, char **argv)
                 return 6;
             }
 
-            ret = train(agents, populationSize, numberOfGenerations);
+            train(agents, populationSize, numberOfGenerations).saveToFile(argv[2]);
+            ret = 0;
         }catch (const exception& e){
             cout << "Error: " << e.what() << endl;
             return 7;
